@@ -1,6 +1,5 @@
 import json
 import bilibili_api
-import config
 from bilibili_api import user, sync
 from bilibili_api import Credential
 from bilibili_api import dynamic
