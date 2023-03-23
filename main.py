@@ -1,5 +1,6 @@
 import json
 import bilibili_api
+import config
 from bilibili_api import user, sync
 from bilibili_api import Credential
 from bilibili_api import dynamic
@@ -15,8 +16,32 @@ import datetime
 
 
 
-clientDb = pymongo.MongoClient("mongodb+srv://xumingyang:zDEkIIyqYkxE3HKb@hakubilibilidynamicsfee.ch66v2g.mongodb.net/?retryWrites=true&w=majority")
+clientDb = pymongo.MongoClient(f"mongodb+srv://{config.MONGO_USERNAME}:{config.MONGO_PASSWORD}@{config.MONGO_HOST}/mydatabase?retryWrites=true&w=majority")
 db = clientDb.BILIBILI_DISCORD_BOT
+"""
+Connection string for the MongoDB
+"""
+
+#create a Credential object with your login information. This is used for bilibili login, since bilibili is no longer giving out API tokens for personal use, this is a way to bypass the login
+bilibili_credential = Credential(sessdata=config.credentials["sessdata"], 
+                        bili_jct=config.credentials["bili_jct"], 
+                        buvid3=config.credentials["buvid3"])
+"""
+create a Credential object with your login information. This is used for bilibili login, since bilibili is no longer giving out API tokens for personal use, this is a way to bypass the login
+Steps to retrieve those three data for the credential:
+    1.Login to bilibili.com on desktop in your browser
+    2.Go into developer mode, hit F12
+    3.Go into the storage section, go to Coockies, and go to https://www.bilibili.com
+    4.find the values for the sessdata
+                              bili_jct
+                              buvid3
+Put into config file
+
+The coockie data refreshes every few days or hours, so this thing currently cannot run 24/7 since the coockie data needs to be manually updated every once in a while
+"""
+
+
+
 
 
 intent = discord.Intents.default()
@@ -27,9 +52,7 @@ client = discord.Client(intents=intent)
 
 
 
-# create a Credential object with your login information
-credential = Credential(sessdata="531621a8%2C1695005852%2C79b1c%2A32",
-                        bili_jct="91f0e455162e8601c59c36de045bedd4", buvid3="60A26755-64F9-3D9E-D1C0-775CF1C88F7F51907infoc")
+
 
 async def get_dynamic_link(dynamic_id: str) -> str:
     return f"https://t.bilibili.com/{dynamic_id}"
@@ -143,7 +166,7 @@ async def my_bot_function():
     current_time = datetime.datetime.now()
     print("Current date and time: ")
     print(current_time)
-    dynamic_page_info = await dynamic.get_dynamic_page_info(credential = credential)
+    dynamic_page_info = await dynamic.get_dynamic_page_info(credential = bilibili_credential)
     print(dynamic_page_info)
     guildX = await client.fetch_guild(1007134321565503618)
     category_name = "BiliBili_feed_test"
@@ -230,7 +253,7 @@ async def on_message(message):
 
   if message.content.startswith('hello!!!!!'):
     await message.channel.send('Hello12345!')
-    dynamic_page_info = await dynamic.get_dynamic_page_info(credential = credential)
+    dynamic_page_info = await dynamic.get_dynamic_page_info(credential = bilibili_credential)
     
     guildX = await client.fetch_guild(1007134321565503618)
     category_name = "BiliBili_feed_test"
@@ -295,7 +318,7 @@ async def on_message(message):
 
 
 async def main():
-    await client.start('MTA4NTcyNjE1NzQyMjQ2OTI3Mw.GM-9-O.Cnwhb2opjLuR9XZxFU11upUS02ktPE4rC7fpRI')
+    await client.start(config.DISCORD_TOKEN)
 
 asyncio.run(main())
 
