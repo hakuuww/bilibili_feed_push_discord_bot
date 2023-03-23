@@ -23,9 +23,9 @@ Connection string for the MongoDB
 """
 
 #create a Credential object with your login information. This is used for bilibili login, since bilibili is no longer giving out API tokens for personal use, this is a way to bypass the login
-bilibili_credential = Credential(sessdata=config.credentials["sessdata"], 
-                        bili_jct=config.credentials["bili_jct"], 
-                        buvid3=config.credentials["buvid3"])
+bilibili_credential = Credential(sessdata=config.BILIBILI_CREDENTIALS["sessdata"], 
+                        bili_jct=config.BILIBILI_CREDENTIALS["bili_jct"], 
+                        buvid3=config.BILIBILI_CREDENTIALS["buvid3"])
 """
 create a Credential object with your login information. This is used for bilibili login, since bilibili is no longer giving out API tokens for personal use, this is a way to bypass the login
 Steps to retrieve those three data for the credential:
@@ -172,8 +172,8 @@ async def my_bot_function():
     category_name = "BiliBili_feed_test"
  
     bilibili_feed_id = 1087885108343738408
-    print(len(guildX.channels))
-    print(len(guildX.categories))
+    #print(len(guildX.channels))
+    #print(len(guildX.categories))
     for guild in client.guilds:
         if(guild.id == 1007134321565503618):
             guildX = guild     
@@ -190,14 +190,14 @@ async def my_bot_function():
         
         category_name = "BiliBili_feed_test"
         
-        for category in guild.categories:
-            print(f"ID: {category.id}")
+        #for category in guild.categories:
+            #print(f"ID: {category.id}")
       
         if id_already_exists is not None:
-            print('Id already exists inside table, no insertion will be performed')
+            print(f"Dynamic Id:{dynamic_id_num} by Up:{id_already_exists['author']} already exists inside table, no insertion will be performed")
         else:    
             print('Id does not exists inside the current table, perform insertion')
-            #1007134321565503618
+            
             category_name = "BiliBili_feed_test"
                     
             dynamic_author_name = await get_sender_name(info)
@@ -253,15 +253,21 @@ async def on_message(message):
 
   if message.content.startswith('hello!!!!!'):
     await message.channel.send('Hello12345!')
-    dynamic_page_info = await dynamic.get_dynamic_page_info(credential = bilibili_credential)
     
-    guildX = await client.fetch_guild(1007134321565503618)
-    category_name = "BiliBili_feed_test"
+    try:
+        dynamic_page_info = await dynamic.get_dynamic_page_info(credential=bilibili_credential)
+    except Exception as ex:
+        print(f"An exception occurred: {ex}")
+        print(f"Stack trace: {ex.__traceback__}")
+        print(f"Source: {ex.__cause__}")
+        
+        guildX = await client.fetch_guild(1007134321565503618)
+        category_name = "BiliBili_feed_test"
 
     
     bilibili_feed_id = 1087885108343738408
-    print(len(guildX.channels))
-    print(len(guildX.categories))
+    #print(len(guildX.channels))
+    #print(len(guildX.categories))
     for guild in client.guilds:
         if(guild.id == 1007134321565503618):
             guildX = guild     
@@ -283,10 +289,9 @@ async def on_message(message):
             print(f"ID: {category.id}")
       
         if id_already_exists is not None:
-            print('Id already exists inside table, no insertion will be performed')
+            print(f"Dynamic Id:{dynamic_id_num} by Up:{id_already_exists['author']} already exists inside table, no insertion will be performed")
         else:    
             print('Id does not exists inside the current table, perform insertion')
-            #1007134321565503618
             category_name = "BiliBili_feed_test"
                     
             dynamic_author_name = await get_sender_name(info)
