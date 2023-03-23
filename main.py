@@ -13,19 +13,22 @@ import time
 import asyncio
 from discord.ext import commands, tasks
 import datetime
+from dotenv import load_dotenv
 
 
 
-clientDb = pymongo.MongoClient(f"mongodb+srv://{config.MONGO_USERNAME}:{config.MONGO_PASSWORD}@{config.MONGO_HOST}/mydatabase?retryWrites=true&w=majority")
+load_dotenv()
+#print(os.environ)
+clientDb = pymongo.MongoClient(f"mongodb+srv://{os.environ.get('MONGO_USERNAME')}:{os.environ.get('MONGO_PASSWORD')}@{os.environ.get('MONGO_HOST')}/mydatabase?retryWrites=true&w=majority")
 db = clientDb.BILIBILI_DISCORD_BOT
 """
 Connection string for the MongoDB
 """
 
 #create a Credential object with your login information. This is used for bilibili login, since bilibili is no longer giving out API tokens for personal use, this is a way to bypass the login
-bilibili_credential = Credential(sessdata=config.BILIBILI_CREDENTIALS["sessdata"], 
-                        bili_jct=config.BILIBILI_CREDENTIALS["bili_jct"], 
-                        buvid3=config.BILIBILI_CREDENTIALS["buvid3"])
+bilibili_credential = Credential(sessdata=os.environ.get('BILIBILI_CREDENTIALS_SESSDATA'), 
+                        bili_jct=os.environ.get('BILIBILI_CREDENTIALS_BILI_JCT'), 
+                        buvid3=os.environ.get('BILIBILI_CREDENTIALS_Buvid3'))
 """
 create a Credential object with your login information. This is used for bilibili login, since bilibili is no longer giving out API tokens for personal use, this is a way to bypass the login
 Steps to retrieve those three data for the credential:
@@ -166,10 +169,15 @@ async def my_bot_function():
     current_time = datetime.datetime.now()
     print("Current date and time: ")
     print(current_time)
-    dynamic_page_info = await dynamic.get_dynamic_page_info(credential = bilibili_credential)
-    print(dynamic_page_info)
-    guildX = await client.fetch_guild(1007134321565503618)
-    category_name = "BiliBili_feed_test"
+    try:
+        dynamic_page_info = await dynamic.get_dynamic_page_info(credential=bilibili_credential)
+    except Exception as ex:
+        print(f"An exception occurred: {ex}")
+        print(f"Stack trace: {ex.__traceback__}")
+        print(f"Source: {ex.__cause__}")
+        
+        guildX = await client.fetch_guild(1007134321565503618)
+        category_name = "BiliBili_feed_test"
  
     bilibili_feed_id = 1087885108343738408
     #print(len(guildX.channels))
@@ -323,7 +331,7 @@ async def on_message(message):
 
 
 async def main():
-    await client.start(config.DISCORD_TOKEN)
+    await client.start(os.environ.get('DISCORD_TOKEN'))
 
 asyncio.run(main())
 
