@@ -26,6 +26,7 @@ pyasn1==0.4.8
 pycodestyle==2.10.0
 pymongo==4.3.3
 pypng==0.20220715.0
+python-dotenv==1.0.0
 pytz==2022.7.1
 pytz-deprecation-shim==0.1.0.post0
 PyYAML==6.0
